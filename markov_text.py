@@ -1,7 +1,4 @@
 import numpy as np
-import pandas as pd
-import requests
-import re
 from collections import defaultdict
 
 
@@ -13,13 +10,17 @@ class MarkovText:
     
     
     def get_term_dict(self):
-        tokens = self.corpus.split(" ")
+        tokens = self.corpus.split()
         term_dict = defaultdict(list)
         
-        for i in range(len(tokens) - 1):
+        for i in range(len(tokens)):
             current_word = tokens[i]
-            next_word = tokens[i + 1]
-            term_dict[current_word].append(next_word)
+            
+            if i < len(tokens) - 1:
+                next_word = tokens[i + 1]
+                term_dict[current_word].append(next_word)
+            else:
+                term_dict[current_word]
         
         return dict(term_dict)
     
@@ -30,17 +31,17 @@ class MarkovText:
             current_word = np.random.choice(list(self.term_dict.keys()))
         else:
             if seed_term not in self.term_dict:
-                raise ValueError("Seed term not found in corpus.")
+                raise ValueError
             current_word = seed_term
         
         output = [current_word]
         
         for _ in range(term_count - 1):
+            next_words = self.term_dict.get(current_word)
             
-            if current_word not in self.term_dict:
+            if not next_words:
                 break
             
-            next_words = self.term_dict[current_word]
             current_word = np.random.choice(next_words)
             output.append(current_word)
         
